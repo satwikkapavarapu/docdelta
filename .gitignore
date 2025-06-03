@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Python / Poetry
+__pycache__/
+*.py[cod]
+*.log
+
+# Node / Vite
+ui/**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Build artifacts
+dist/
+build/
