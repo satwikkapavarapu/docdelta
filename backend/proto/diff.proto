@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package docdelta;
+
+service DiffService {
+  rpc ExtractText (DocumentPath) returns (stream ExtractedPage);
+  rpc ComputeDiff (DocumentPair) returns (DiffResponse);
+  rpc SummarizeDiff (DiffJson) returns (SummaryResponse);
+}
+
+message DocumentPath {
+  string path = 1;
+}
+
+message DocumentPair {
+  string path1 = 1;
+  string path2 = 2;
+}
+
+message DiffJson {
+  string json = 1;
+}
+
+message ExtractedPage {
+  int32 page = 1;
+  repeated string paragraphs = 2;
+}
+
+message DiffResponse {
+  string result = 1;
+}
+
+message SummaryResponse {
+  string summary = 1;
+}
