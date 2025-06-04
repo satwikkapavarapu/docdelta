@@ -1,0 +1,9 @@
+# Python dependencies for DocDelta backend
+pdfminer-six==20221105
+python-docx==1.1.2
+diff-match-patch==20241021
+protobuf==6.31.1
+grpcio==1.72.1
+
+# Additional packages used in tests
+fpdf2>=2.7.6
