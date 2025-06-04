@@ -1,8 +1,10 @@
 import json
 from pathlib import Path
+import sys
 import pytest
 
 HERE = Path(__file__).parent
+sys.path.insert(0, str(HERE.parent))
 SAMPLE_DOCS = HERE.parent / "sample_docs"
 
 # (old, new, golden) triples
@@ -29,6 +31,9 @@ def test_golden_diff(old_f, new_f, golden_f):
     # Skip unsupported formats for now
     if old_path.suffix.lower() != ".pdf":
         pytest.xfail("Extractor for DOCX / advanced PDFs not implemented yet")
+
+    if not old_path.exists() or not new_path.exists():
+        pytest.skip("Test file(s) missing")
 
     with golden_path.open() as fp:
         expected = json.load(fp)

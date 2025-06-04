@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DocDelta PDF Diff Viewer</title>
+<style>
+  body { font-family: sans-serif; }
+  #container { display: flex; gap: 1rem; }
+  .pdfWrapper { position: relative; }
+  .highlight { position:absolute; pointer-events:none; opacity:0.4; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.js"></script>
+</head>
+<body>
+<h1>DocDelta PDF Diff Viewer</h1>
+<input id="file1" type="file"> <input id="file2" type="file">
+<button id="compareBtn">Compare</button>
+<div id="container">
+  <div id="pdf1" class="pdfWrapper"></div>
+  <div id="pdf2" class="pdfWrapper"></div>
+</div>
+<script>
+const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+
+async function renderPDF(wrapper, file, highlights) {
+  wrapper.innerHTML = '';
+  if(!file) return;
+  const data = new Uint8Array(await file.arrayBuffer());
+  const pdf = await pdfjsLib.getDocument({data}).promise;
+  for(let pageNum=1; pageNum<=pdf.numPages; pageNum++){
+    const page = await pdf.getPage(pageNum);
+    const scale = 1.5;
+    const viewport = page.getViewport({scale});
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    wrapper.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    await page.render({canvasContext: ctx, viewport}).promise;
+    const pageHighlights = highlights.filter(h=>h.page===pageNum);
+    pageHighlights.forEach(h=>{
+        const div = document.createElement('div');
+        div.className = 'highlight';
+        div.style.left = (h.bbox[0]*scale)+'px';
+        div.style.bottom = (viewport.height - h.bbox[3]*scale)+'px';
+        div.style.width = ((h.bbox[2]-h.bbox[0])*scale)+'px';
+        div.style.height = ((h.bbox[3]-h.bbox[1])*scale)+'px';
+        div.style.backgroundColor = h.type==='INSERT'? 'green': h.type==='DELETE'? 'red':'blue';
+        wrapper.appendChild(div);
+    });
+  }
+}
+
+document.getElementById('compareBtn').addEventListener('click', async()=>{
+  const file1 = document.getElementById('file1').files[0];
+  const file2 = document.getElementById('file2').files[0];
+  if(!file1 || !file2){ alert('select both files'); return; }
+  const formData = new FormData();
+  formData.append('file1', file1);
+  formData.append('file2', file2);
+  const res = await fetch('/compare_json', {method:'POST', body:formData});
+  const diff = await res.json();
+  renderPDF(document.getElementById('pdf1'), file1, diff.filter(d=>d.type!=='INSERT'));
+  renderPDF(document.getElementById('pdf2'), file2, diff.filter(d=>d.type!=='DELETE'));
+});
+</script>
+</body>
+</html>
