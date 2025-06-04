@@ -93,7 +93,13 @@ def _boxes_for_range(lines, start, end):
             continue
         if line["start"] >= end:
             break
-        boxes.append({"page": line["page"], "bbox": line["bbox"], "text": line["text"]})
+        boxes.append(
+            {
+                "page": line["page"],
+                "bbox": line["bbox"],
+                "text": line["text"],
+            }
+        )
     return boxes
 
 
@@ -190,7 +196,11 @@ def main():
     parser = argparse.ArgumentParser(description="Diff two PDFs")
     parser.add_argument("file1")
     parser.add_argument("file2")
-    parser.add_argument("--json", action="store_true", help="Output JSON with coordinates")
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Output JSON with coordinates",
+    )
     args = parser.parse_args()
 
     file1, file2 = args.file1, args.file2
