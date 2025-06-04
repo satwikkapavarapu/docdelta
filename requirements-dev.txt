@@ -1,0 +1,5 @@
+# Development and testing dependencies for DocDelta
+pytest>=8.4.0
+ruff>=0.11.12
+black>=25.1.0
+pre-commit>=4.2.0
