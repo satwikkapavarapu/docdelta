@@ -19,6 +19,3 @@
 
 Simply provide two PDF files as input. The output will be a `.txt` file summarizing the detected differences.
 
-## License
-
-This project is licensed under [your license here].
